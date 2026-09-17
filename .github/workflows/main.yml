@@ -1,0 +1,54 @@
+name: Java Spring Boot CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    name: Build, Test & Package API
+    runs-on: ubuntu-latest
+
+    # 1. Configuración del servicio de MySQL efímero
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: multiservicespsidb
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Dar permisos de ejecución al Maven Wrapper
+        run: chmod +x ./mvnw
+
+      - name: Ejecutar Pruebas (Unitarias y de Contexto)
+        env:
+          # Credenciales para el MySQL efímero del pipeline
+          userMySQL: root
+          passMySQL: root
+          # Clave JWT inyectada de forma segura mediante Secretos de GitHub
+          claveJWT: ${{ secrets.JWT_SECRET }}
+        run: ./mvnw test
+
+      - name: Compilar y Empaquetar el JAR
+        # Si las pruebas (paso anterior) fallan, este paso no se ejecuta
+        run: ./mvnw clean package -DskipTests
