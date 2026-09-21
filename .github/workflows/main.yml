@@ -47,6 +47,7 @@ jobs:
           passMySQL: root
           # Clave JWT inyectada de forma segura mediante Secretos de GitHub
           claveJWT: ${{ secrets.JWT_SECRET }}
+          idCliente: ${{ secrets.GOOGLE_CLIENT_ID }}
         run: ./mvnw test
 
       - name: Compilar y Empaquetar el JAR
