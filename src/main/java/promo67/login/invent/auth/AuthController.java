@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 public class AuthController {
 
     private final AuthService authService;
+    private final AuthGoogleService authGService;
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> loginUser(@RequestBody LoginRequest request) {
@@ -24,6 +25,11 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> registerUser(@RequestBody RegisterRequest request) {
         return ResponseEntity.created(null).body(authService.register(request));
+    }
+
+    @PostMapping("/Google")
+    public ResponseEntity<AuthResponse> googleUser(@RequestBody GoogleLoginRequest request) {
+        return ResponseEntity.ok(authGService.enter(request));
     }
 
 }
