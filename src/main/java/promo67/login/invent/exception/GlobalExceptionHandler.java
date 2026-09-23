@@ -8,14 +8,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    // Este método interceptará cualquier IllegalArgumentException que lance tu verificador de Google
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleInvalidToken(IllegalArgumentException ex) {
         
-        System.out.println("--- Acceso denegado ---");
-        System.out.println("Motivo: " + ex.getMessage());
-        
-        // Retornamos un 401 en lugar del 500 por defecto
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token de autenticación inválido, mal formado o expirado.");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales invalidas "+ex.getMessage());
     }
 }
